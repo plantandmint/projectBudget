@@ -1,0 +1,162 @@
+ <!-- Header-->
+ <header id="header" class="header" style="margin-bottom: 15px;">
+    <div class="header-menu">
+        <div class="col-sm-8">
+            <div class="page-header float-left">
+                    <h1> สรุปผลโครงการ {{ name || '' }} </h1>
+            </div>
+        </div>
+    </div>
+</header><!-- /header -->
+<div class="col-md-12">
+    <div class="card">
+        <div class="card-header">
+            <strong class="card-title">สัดส่วนค่าใช้จ่ายตามประเภท</strong>
+        </div>
+        <div class="card-body">
+            <div id="container-type" style="min-width: 310px; height: 400px; max-width: 600px; margin: 0 auto; margin-top: 40px"></div>
+        </div>
+    </div>
+</div>
+<div class="col-md-12">
+    <div class="card">
+        <div class="card-header">
+            <strong class="card-title">กิจกรรม</strong>
+        </div>
+        <div class="card-body">
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <th scope="col"> <input type="checkbox" ng-model="activity_select_all" ng-change="on_change_activity_select_all()"> </th>
+                        <th scope="col">กิจกรรม</th>
+                        <th scope="col">เดือน</th>
+                        <th scope="col">งบประมาณต่อกิจกรรม/บาท</th>
+                        <th scope="col">เบิกจ่าย</th>
+                        <th scope="col">(ระบบคำนวณเป็น %)</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr ng-repeat="activity in activities track by $index" >
+                        <th scope="row"> <input type="checkbox" ng-change="on_selected_activity_changed()" ng-model="activity.selected"> </th>
+                        <td>{{ activity.name }}</td>
+                        <td>{{ activity.start }} - {{ activity.end }}</td>
+                        <td>{{ numberWithCommas(activity.budget) }}</td>
+                        <td>{{ numberWithCommas(activity.disburse) }}</td>
+                        <td>{{ (activity.disburse * 100 ) / activity.budget  }}</td>
+                    </tr>
+
+                </tbody>
+                <tfoot>
+                    <tr>
+                        <th scope="row">รวม</th>
+                        <td></td>
+                        <td>{{ last_month }}</td>
+                        <td>{{ numberWithCommas(a_all = used_budget) }}</td>
+                        <td>{{ numberWithCommas(used_disburse) }}</td>
+                        <td>{{ percent.toFixed(2) }}</td>
+                    </tr>
+                <tfoot>
+            </table>
+
+            <div id="container" style="min-width: 310px; height: 400px; max-width: 600px; margin: 0 auto; margin-top: 40px"></div>
+        </div>
+    </div>
+</div>
+
+<div class="col-md-12">
+    <div class="card">
+        <div class="card-header">
+            <strong class="card-title">ค่าใช้จ่ายบุคลากร</strong>
+            <div class="float-right">
+            </div>
+        </div>
+        <div class="card-body">
+            <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th scope="col"><input type="checkbox" ng-model="staff_select_all" ng-change="on_change_staff_select_all()"/></th>
+                    <th scope="col">ตำเเหน่ง</th>
+                    <th scope="col">ชื่อ</th>
+                    <th scope="col">อัตรา / เดือน</th>
+                    <th scope="col">จำนวน (บาท)</th>
+                    <th scope="col">ร้อยละ/งบประมาณทั้งหมด</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr ng-repeat="staff in staffs track by $index">
+                    <th scope="row"><input type="checkbox" ng-change="on_selected_staff_changed()" ng-model="staff.selected"/></th>
+                    <td>{{ staff.position }}</td>
+                    <td>{{ staff.fullname }}</td>
+                    <td>{{ numberWithCommas(staff.salary)  }}</td>
+                    <td>{{  numberWithCommas(staff.salary * last_month) }}</td>
+                    <td>{{  ((staff.salary * last_month) * 100 / budget_all ).toFixed(2) }}</td>
+                </tr>
+            </tbody>
+            <tfoot>
+                <tr>
+                    <th scope="row">รวม</th>
+                    <td></td>
+                    <td></td>
+                    <td>{{ numberWithCommas(all_salary) }}</td>
+                    <td>{{ numberWithCommas(s_all = all_salary * last_month) }}</td>
+                    <td>{{ ((s_all) * 100 / budget_all ).toFixed(2) }}</td>
+                </tr>
+            <tfoot>
+            </table>
+
+            <div id="container-staff" style="min-width: 310px; height: 400px; max-width: 600px; margin: 0 auto; margin-top: 40px"></div>
+
+        </div>
+
+    </div>
+</div>
+
+<div class="col-md-12">
+    <div class="card">
+        <div class="card-header">
+            <strong class="card-title">ค่าใช้จ่ายมหาวิทยาลัย</strong>
+        </div>
+        <div class="card-body">
+            <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th scope="col"> <input type="checkbox" ng-model="organize_all_selected" ng-change="organize_all_selected_change()"> </th>
+                    <th scope="col">รายการ</th>
+                    <th scope="col">เปอร์เซ็น</th>
+                    <th scope="col">จำนวนเงินที่ใช้</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <th scope="row"> <input type="checkbox" ng-model="university_selected" ng-change="sub_organize_change()"> </th>
+                    <td>มหาวิทยาลัย</td>
+                    <td>{{ u_percent_budget * 100 }}</td>
+                    <td>{{ numberWithCommas(u_vate = budget_all * u_percent_budget) }}</td>
+                </tr>
+                <tr>
+                    <th scope="row"> <input type="checkbox" ng-model="factory_selected" ng-change="sub_organize_change()"> </th>
+                    <td>คณะ</td>
+                    <td>{{ f_percent_budget * 100 }}</td>
+                    <td>{{ numberWithCommas(f_vate = budget_all * f_percent_budget) }}</td>
+                </tr>
+                <tr>
+                <th scope="row"><input type="checkbox" ng-model="department_selected" ng-change="sub_organize_change()"></th>
+                    <td>ภาค</td>
+                    <td>{{ d_percent_budget * 100 }}</td>
+                    <td>{{ numberWithCommas(d_vate = budget_all * d_percent_budget) }}</td>
+                </tr>
+            </tbody>
+            <tfoot>
+                <tr>
+                    <th scope="row">รวม</th>
+                    <td></td>
+                    <td>{{ (u_percent_budget + f_percent_budget + d_percent_budget) * 100 }}</td>
+                    <td>{{ numberWithCommas(u_vate + f_vate + d_vate) }}</td>
+                </tr>
+            <tfoot>
+            </table>
+
+            <div id="container-organize" style="min-width: 310px; height: 400px; max-width: 600px; margin: 0 auto; margin-top: 40px"></div>
+        </div>
+    </div>
+</div>
